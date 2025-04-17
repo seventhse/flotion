@@ -76,7 +76,6 @@ export function useCanvasStyle() {
       width: state.width,
       height: state.height,
       backgroundColor: state.backgroundColor,
-      willChange: 'transform',
     }
   }))
 
@@ -84,5 +83,6 @@ export function useCanvasStyle() {
     width: `${width}px`,
     height: `${height}px`,
     backgroundColor,
+    willChange: 'transform',
   }
 }

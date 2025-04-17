@@ -10,11 +10,10 @@ import {
   useResizeObserver,
 } from '@llm-flow/utils'
 import Panzoom from '@panzoom/panzoom'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useShallow } from 'zustand/shallow'
 import { useCanvasStore } from '~/store/canvas.store'
 import { calculateCenterPosition } from './canvas-helper'
-
 
 export function usePanzoom<T extends HTMLElement>(
   target: BasicTarget<T>,
@@ -22,9 +21,13 @@ export function usePanzoom<T extends HTMLElement>(
 ) {
   const panzoom = useRef<PanzoomObject | null>(null)
   const [needToCenter, setNeedToCenter] = useState(false);
-  const [disabledPan, scale, setScale, pan, setPan] = useCanvasStore(useShallow(
-    state => [state.disabledPan, state.zoom, state.updateZoom, state.pan, state.updatePan]
+  const [disabledPan, scale, setScale, setPan] = useCanvasStore(useShallow(
+    state => [state.disabledPan, state.zoom, state.updateZoom, state.updatePan]
   ))
+
+  const cursorStyle = useMemo(() => {
+    return disabledPan ? 'auto' : 'grab'
+  }, [disabledPan])
 
   const centeredExecute = throttleRAF((animate = true) => {
     const panzoomInstance = panzoom.current;
@@ -89,9 +92,9 @@ export function usePanzoom<T extends HTMLElement>(
       disablePan: disabledPan,
       startScale: scale,
       roundPixels: true,
+      cursor: cursorStyle,
       ...options
     })
-    instance.setStyle('cursor', disabledPan ? 'auto' : 'grab')
     panzoom.current = instance
 
     el.addEventListener('panzoomchange', watchPanCallback)
@@ -124,9 +127,10 @@ export function usePanzoom<T extends HTMLElement>(
       panzoom.current.setOptions({
         disablePan: disabledPan,
       })
-      panzoom.current.setStyle('cursor', disabledPan ? 'auto' : 'grab')
+      getTargetElement(target)?.parentElement?.style.setProperty('cursor', cursorStyle)
+      panzoom.current.setStyle('cursor', cursorStyle)
     }
-  }, [disabledPan])
+  }, [disabledPan, cursorStyle])
 
   useEventListener('wheel', throttleWheel, {
     target: getTargetElement(target)?.parentElement,

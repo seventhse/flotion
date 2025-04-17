@@ -26,7 +26,7 @@ export interface UseCanvasResizeOptions {
   minHeight?: number
   maxWidth?: number
   maxHeight?: number
-  onResize?: (size: Size) => void
+  onResize?: (size: Size, direction: Direction) => void
   onStop?: () => void
 }
 
@@ -76,7 +76,7 @@ export function useCanvasResize(options: UseCanvasResizeOptions = {}) {
       },
     )
 
-    resizeFn.current?.({ width, height })
+    resizeFn.current?.({ width, height }, currentDirection.current)
   }))
 
   const handleResizeEnd = useEvent(() => {

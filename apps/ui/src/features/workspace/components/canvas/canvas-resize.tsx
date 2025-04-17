@@ -5,6 +5,7 @@ import { memo, useState } from 'react'
 import { useShallow } from 'zustand/shallow'
 import { directions, useCanvasResize } from '~/hooks/use-canvas-resize'
 import { useCanvasStore } from '~/store/canvas.store'
+import { useCanvasWrapperContext } from './context'
 
 const resizeCursorVariant = cva('panzoom-exclude fixed inset-0 z-[9999]', {
   variants: {
@@ -76,11 +77,51 @@ export function CanvasResize() {
     updateSize: state.updateSize,
   })))
 
+  const { panzoom } = useCanvasWrapperContext()
+
   const { handleResizeStart } = useCanvasResize({
     minWidth: 100,
     minHeight: 100,
-    onResize: (size) => {
+    onResize: (size, direction) => {
       updateSize(size.width, size.height)
+      if (!['bottom', 'right', 'bottomRight'].includes(direction)) {
+        const delta = {
+          x: size.width - width,
+          y: size.height - height,
+        }
+        const panzoomInstance = panzoom.current
+        if (!panzoomInstance) {
+          return
+        }
+        const pan = panzoomInstance.getPan()
+
+        let newX = pan.x
+        let newY = pan.y
+
+        switch (direction) {
+          case 'top':
+            newY -= delta.y
+            break
+          case 'left':
+            newX -= delta.x
+            break
+          case 'topLeft':
+            newX -= delta.x
+            newY -= delta.y
+            break
+          case 'topRight':
+            newY -= delta.y
+            break
+          case 'bottomLeft':
+            newX -= delta.x
+            break
+        }
+
+        panzoomInstance.pan(newX, newY, {
+          animate: false,
+          force: true
+        })
+      }
     },
     onStop: () => {
       setActiveDirection(null)
