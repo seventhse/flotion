@@ -3,11 +3,12 @@ import type { PanzoomObject, PanzoomOptions } from '@panzoom/panzoom'
 import {
   getTargetElement,
   throttleRAF,
+  useDebounceCallback,
   useEvent,
   useEventListener,
   useOnMount,
-  useUnMount,
   useResizeObserver,
+  useUnMount,
 } from '@llm-flow/utils'
 import Panzoom from '@panzoom/panzoom'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -20,9 +21,9 @@ export function usePanzoom<T extends HTMLElement>(
   options: PanzoomOptions = {},
 ) {
   const panzoom = useRef<PanzoomObject | null>(null)
-  const [needToCenter, setNeedToCenter] = useState(false);
+  const [needToCenter, setNeedToCenter] = useState(false)
   const [disabledPan, scale, setScale, setPan] = useCanvasStore(useShallow(
-    state => [state.disabledPan, state.zoom, state.updateZoom, state.updatePan]
+    state => [state.disabledPan, state.zoom, state.updateZoom, state.updatePan],
   ))
 
   const cursorStyle = useMemo(() => {
@@ -30,7 +31,7 @@ export function usePanzoom<T extends HTMLElement>(
   }, [disabledPan])
 
   const centeredExecute = throttleRAF((animate = true) => {
-    const panzoomInstance = panzoom.current;
+    const panzoomInstance = panzoom.current
 
     const targetEl = getTargetElement(target)
     if (!targetEl || !panzoomInstance) {
@@ -38,9 +39,11 @@ export function usePanzoom<T extends HTMLElement>(
     }
 
     const zoomOptions = {
-      force: true, animate, relative: true
+      force: true,
+      animate,
+      relative: true,
     }
-    const scale = panzoomInstance.getScale();
+    const scale = panzoomInstance.getScale()
     const panPosition = calculateCenterPosition(targetEl, scale)
 
     if (!panPosition) {
@@ -52,12 +55,14 @@ export function usePanzoom<T extends HTMLElement>(
       return
     }
 
-    panzoomInstance.pan(panPosition.x, panPosition.y, zoomOptions);
+    panzoomInstance.pan(panPosition.x, panPosition.y, zoomOptions)
   }, { trailing: false })
 
   const centered = () => {
     setNeedToCenter(true)
   }
+
+  const debounceCentered = useDebounceCallback(centered, 500)
 
   const watchPanCallback = useEvent(() => {
     const pan = panzoom.current?.getPan()
@@ -93,7 +98,7 @@ export function usePanzoom<T extends HTMLElement>(
       startScale: scale,
       roundPixels: true,
       cursor: cursorStyle,
-      ...options
+      ...options,
     })
     panzoom.current = instance
 
@@ -107,7 +112,7 @@ export function usePanzoom<T extends HTMLElement>(
     }
     const panzoomInstance = panzoom.current
     panzoomInstance.zoomWithWheel(e, {
-      localPoint: true
+      localPoint: true,
     })
     setScale(panzoomInstance.getScale())
   }))
@@ -120,7 +125,7 @@ export function usePanzoom<T extends HTMLElement>(
       setNeedToCenter(false)
       centeredExecute()
     }
-  }, [needToCenter])
+  }, [needToCenter, centeredExecute])
 
   useEffect(() => {
     if (panzoom.current) {
@@ -130,22 +135,21 @@ export function usePanzoom<T extends HTMLElement>(
       getTargetElement(target)?.parentElement?.style.setProperty('cursor', cursorStyle)
       panzoom.current.setStyle('cursor', cursorStyle)
     }
-  }, [disabledPan, cursorStyle])
+  }, [disabledPan, cursorStyle, target])
 
   useEventListener('wheel', throttleWheel, {
     target: getTargetElement(target)?.parentElement,
-    passive: false
+    passive: false,
   })
-  useEventListener('resize', centered, {
-    target: getTargetElement(target)?.parentElement?.parentElement
+  useEventListener('resize', debounceCentered, {
+    target: getTargetElement(target)?.parentElement?.parentElement,
   })
-  useResizeObserver(centered, {
-    target: getTargetElement(target)?.parentElement?.parentElement
+  useResizeObserver(debounceCentered, {
+    target: getTargetElement(target)?.parentElement?.parentElement,
   })
-
 
   return {
     panzoom,
-    centered
+    centered,
   }
 }
