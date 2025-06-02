@@ -1,13 +1,20 @@
+import { FlotionApp } from '@llm-flow/flotion'
+import { useOnMount } from '@llm-flow/utils'
 import { StrictMode } from 'react'
-import { Workspace } from './features/workspace/workspace'
-import { AppLayout } from './layout/app-layout'
+import { useThemeStore } from './store/theme.store'
 
 export function App() {
+  const theme = useThemeStore()
+
+  useOnMount(() => {
+    theme.initTheme()
+  })
+
   return (
     <StrictMode>
-      <AppLayout>
-        <Workspace />
-      </AppLayout>
+      <FlotionApp
+        theme={theme.systemTheme}
+      />
     </StrictMode>
   )
 }

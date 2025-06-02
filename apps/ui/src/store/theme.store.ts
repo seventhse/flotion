@@ -1,10 +1,11 @@
 import type { ThemeMode } from '~/utils/theme-helper'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { THEME_MODE_KEY, updateTheme } from '~/utils/theme-helper'
+import { getSystemTheme, THEME_MODE_KEY, updateTheme } from '~/utils/theme-helper'
 
 export interface ThemeState {
   currentTheme: ThemeMode
+  systemTheme: 'dark' | 'light'
   switchTheme: (mode?: ThemeMode) => void
   initTheme: () => void
 }
@@ -13,10 +14,11 @@ const useThemeStore = create<ThemeState>()(
   persist((set, get) => {
     return {
       currentTheme: 'system',
+      systemTheme: 'light',
       switchTheme: (mode?: ThemeMode) => {
         mode = mode ?? 'system'
         updateTheme(mode)
-        set({ currentTheme: mode })
+        set({ currentTheme: mode, systemTheme: getSystemTheme() })
       },
       initTheme: () => {
         updateTheme(get().currentTheme)

@@ -86,3 +86,15 @@ export function useCanvasStyle() {
     willChange: 'transform',
   }
 }
+
+export function useCanvasValue() {
+  return useCanvasStore(useShallow(state => ({
+    width: state.width,
+    height: state.height,
+    backgroundColor: state.backgroundColor,
+    zoom: state.zoom,
+    disabledPan: state.disabledPan,
+  })))
+}
+
+export type CanvasValue = ReturnType<typeof useCanvasValue>

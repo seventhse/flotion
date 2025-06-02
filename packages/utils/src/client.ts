@@ -1,10 +1,15 @@
+const userAgent = navigator.userAgent.toLowerCase()
+
+export const isDarwin = /Mac|iPod|iPhone|iPad/.test(userAgent);
+export const isWindows = /^Win/.test(userAgent);
+export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
+
 export function isBrowser(): boolean {
   return typeof window !== "undefined" && typeof window.document !== "undefined"
 }
 
 export function isMobileDevice(): boolean {
   try {
-    const userAgent = navigator.userAgent.toLowerCase()
     return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent)
   } catch (e) {
     console.error("Error checking mobile device:", e)
@@ -14,7 +19,6 @@ export function isMobileDevice(): boolean {
 
 export function isMacOs(): boolean {
   try {
-    const userAgent = navigator.userAgent.toLowerCase()
     return userAgent.includes("mac os")
   } catch (e) {
     console.error("Error checking MacOS:", e)

@@ -1,0 +1,15 @@
+{
+  "name": "@llm-flow/common",
+  "version": "0.0.1",
+  "description": "Shared common variant.",
+  "author": "Seventhse <season.sevent@icloud.com> (https://github.com/seventhse)",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "src"
+  ],
+  "peerDependencies": {
+  },
+  "devDependencies": {
+  }
+}

@@ -1,0 +1,37 @@
+.flotion-wrapper{
+  height: 100%;
+}
+.flotion {
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+.flotion-ui-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.flotion__canvas-wrapper {
+  pointer-events: none
+}
+
+.flotion__canvas {
+  position: absolute;
+}
+
+.flotion__interactive-canvas {
+  z-index: 2;
+}
+
+.flotion__new-canvas {
+  z-index: 3;
+}

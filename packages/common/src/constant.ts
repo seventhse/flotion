@@ -1,0 +1,14 @@
+
+export const DEFAULT_GRID_SIZE = 20;
+export const DEFAULT_GRID_STEP = 5;
+
+export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
+
+export const SIDE_RESIZING_THRESHOLD = 2 * DEFAULT_TRANSFORM_HANDLE_SPACING
+export const EPSILON = 0.00001;
+export const DEFAULT_COLLISION_THRESHOLD =
+  2 * SIDE_RESIZING_THRESHOLD - EPSILON;
+
+export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
+
+

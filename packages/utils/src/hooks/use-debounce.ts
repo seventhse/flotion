@@ -1,4 +1,4 @@
-import { type DebouncedFunc, debounce, isFunction } from "lodash-es"
+import { DebounceSettings, type DebouncedFunc, debounce, isFunction } from "lodash-es"
 import { useEffect, useMemo, useState } from "react"
 import type { Fn } from "../types"
 import { useLatest } from "./use-latest"
@@ -31,18 +31,18 @@ export function useDebounce<T>(value: T, delay: number): T {
  * @param delay - The debounce delay in milliseconds
  * @returns The debounced function
  */
-export function useDebounceCallback<T extends Fn>(callback: T, delay: number): DebouncedFunc<T> {
+export function useDebounceCallback<T extends Fn>(callback: T, delay: number = 200, options?: DebounceSettings): DebouncedFunc<T> {
   const callbackFn = useLatest(callback)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const debouncedCallback = useMemo(() => {
     return debounce((...args: Parameters<T>) => {
       if (!isFunction(callbackFn.current) && process.env.MODE === "development") {
-        throw new Error("UseDebounce callback first value must is function.")
+        throw new Error("useDebounceCallback: The callback must be a function")
       }
-      callbackFn.current?.(...args)
-    }, delay)
-  }, [delay])
+      return callbackFn.current?.(...args)
+    }, delay,options)
+  }, [delay,options])
 
   useEffect(() => {
     return () => {
